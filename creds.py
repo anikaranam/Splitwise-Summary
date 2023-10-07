@@ -1,3 +1,3 @@
-consumer_key = "4dreJN0JhyDsgPpbfg1QB9c6Pu8iXu4OJUOmAjfO"
-consumer_secret = "4ROoWpM2JtAGELRMqqb10fUvPjb4F6k6uPBO1GmH"
-api_key = "GCmbCoJ3Qp2qhTTKbKoJHVdkTUBQaXHXBXrXTYv6"
+consumer_key = "<consumer key here>"
+consumer_secret = "<consumer secret here>"
+api_key = "<API key here>"
