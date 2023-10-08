@@ -4,6 +4,10 @@ import calendar
 import matplotlib.pyplot as plt 
 import numpy as np 
 from datetime import datetime
+import pandas as pd
+import seaborn as sns
+from sklearn.ensemble import IsolationForest
+from sklearn.preprocessing import LabelEncoder
 
 from_date = sys.argv[1]
 end_date = sys.argv[2]
@@ -172,6 +176,35 @@ def showExpenseCountByCategory(all_expenses):
 	plt.title("Number of expenses per category")  # add title
 	plt.show()
 
+def findAnomalies(all_expenses):
+	categories = []
+	costs = []
+	for exp in all_expenses:
+		categories.append(exp.category)
+		costs.append(exp.cost)
+	categories = np.array(categories)
+	label_encoder = LabelEncoder()
+	categories_integer = label_encoder.fit_transform(categories)
+	df = pd.DataFrame(list(zip(categories_integer, costs, categories)), columns=["Category-Int", "Expense", "Category"])
+	print(df)
+	model=IsolationForest(n_estimators=50, max_samples='auto', contamination=float(0.1),max_features=1.0)
+	model.fit(df[['Category-Int', 'Expense']])
+
+	df['scores']=model.decision_function(df[['Category-Int', 'Expense']])
+	df['anomaly']=model.predict(df[['Category-Int', 'Expense']])
+	print('Below are some unusual expenses based on the category of expense. Please review them:')
+	print(df.loc[df['anomaly'] == -1, ["Category", "Expense"]])
+
+def findExpensesPerCategory(all_expenses, category):
+	categories = []
+	costs = []
+	for exp in all_expenses:
+		categories.append(exp.category)
+		costs.append(exp.cost)
+	df = pd.DataFrame(list(zip(categories, costs)), columns=["Category", "Expense"])
+	print('Your expenses for the ' + category + ' category are:')
+	print(df.loc[df['Category'] == category])
+
 all_expenses, cost_array = getAllExpenses(from_date, end_date)
 getTotalAmountSpent(all_expenses)
 getMaxAmountSpent(all_expenses)
@@ -181,8 +214,5 @@ plotExpenseChart(cost_array, from_date, end_date)
 showExpensesByMonth(all_expenses)
 showExpensesByCategory(all_expenses)
 showExpenseCountByCategory(all_expenses)
-
-
-
-
-
+findAnomalies(all_expenses)
+findExpensesPerCategory(all_expenses, "Car")
