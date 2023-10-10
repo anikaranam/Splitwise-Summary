@@ -195,7 +195,7 @@ def findAnomalies(all_expenses):
 	print('Below are some unusual expenses based on the category of expense. Please review them:')
 	print(df.loc[df['anomaly'] == -1, ["Category", "Expense"]])
 
-def findExpensesPerCategory(all_expenses, category):
+def findExpensesPerCategory(all_expenses, category="General"):
 	categories = []
 	costs = []
 	for exp in all_expenses:
@@ -204,6 +204,20 @@ def findExpensesPerCategory(all_expenses, category):
 	df = pd.DataFrame(list(zip(categories, costs)), columns=["Category", "Expense"])
 	print('Your expenses for the ' + category + ' category are:')
 	print(df.loc[df['Category'] == category])
+
+def findExpensePercentage(all_expenses, from_date, end_date):
+	total_cost = 0.0
+	categoryCosts = {}
+	for exp in all_expenses:
+		if from_date < exp.date < end_date:
+			if not exp.category in categoryCosts:
+				categoryCosts[exp.category] = exp.cost
+			else:
+				categoryCosts[exp.category] += exp.cost
+			total_cost += exp.cost
+	costs = np.array(list(categoryCosts.values())) / total_cost
+	fig, ax = plt.subplots()
+	ax.pie(costs, labels=list(categoryCosts.keys()), radius = 1.0)
 
 all_expenses, cost_array = getAllExpenses(from_date, end_date)
 getTotalAmountSpent(all_expenses)
@@ -215,4 +229,5 @@ showExpensesByMonth(all_expenses)
 showExpensesByCategory(all_expenses)
 showExpenseCountByCategory(all_expenses)
 findAnomalies(all_expenses)
-findExpensesPerCategory(all_expenses, "Car")
+findExpensesPerCategory(all_expenses)
+findExpensePercentage(all_expenses, from_date, end_date)
